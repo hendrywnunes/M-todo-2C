@@ -228,7 +228,7 @@ function RadarChart({ scores, size = 200 }) {
 
 // ── IMC PUBLIC TEST ──
 function IMCTest({ onComplete, isLoggedIn, menteeId }) {
-  const [step, setStep] = useState("intro"); // intro | quiz | capture | result
+  const [step, setStep] = useState("intro"); // intro | warning | quiz | capture | result
   const [currentPillar, setCurrentPillar] = useState(0);
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -295,9 +295,67 @@ function IMCTest({ onComplete, isLoggedIn, menteeId }) {
           </div>
         ))}
       </div>
-      <button style={s.btnPrimary} onClick={() => setStep("quiz")}>
+      <button style={s.btnPrimary} onClick={() => setStep("warning")}>
         Iniciar diagnóstico →
       </button>
+    </div>
+  );
+
+  if (step === "warning") return (
+    <div style={s.quizWrap}>
+      <div style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:".22em", textTransform:"uppercase", color:C.orange, marginBottom:32, display:"flex", alignItems:"center", gap:8 }}>
+        <span style={{ width:20, height:1, background:C.orange, display:"inline-block" }}></span>
+        Antes de começar
+      </div>
+
+      {/* Title */}
+      <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:"clamp(36px,5vw,60px)", lineHeight:.9, letterSpacing:"-.025em", textTransform:"uppercase", marginBottom:32 }}>
+        Este teste só<br/>funciona se você<br/><span style={{ color:C.orange }}>for honesto.</span>
+      </div>
+
+      {/* Warning box */}
+      <div style={{ border:`1px solid ${C.g700}`, borderLeft:`3px solid ${C.orange}`, background:C.g950, padding:"32px 36px", marginBottom:24 }}>
+        <div style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:".2em", textTransform:"uppercase", color:C.orange, marginBottom:20 }}>
+          O que é este diagnóstico
+        </div>
+        <p style={{ fontSize:15, color:C.g100, lineHeight:1.8, marginBottom:0 }}>
+          O IMC é um teste de <strong style={{ color:C.white }}>autoavaliação</strong>. Não existe resposta certa ou errada — existe a sua realidade comercial hoje.
+        </p>
+      </div>
+
+      {/* Points */}
+      <div style={{ display:"flex", flexDirection:"column", gap:2, marginBottom:32 }}>
+        {[
+          ["◎", "Leia cada pergunta com calma", "Não responda com base no que você acha que deveria fazer — responda com base no que você realmente faz, com consistência, no dia a dia."],
+          ["◈", "Evite o viés do ideal", "A tendência natural é escolher a opção que representa quem queremos ser. Resista a isso. O diagnóstico precisa retratar quem você é hoje."],
+          ["◉", "Seja específico, não genérico", "Se você faz algo 'às vezes' ou 'quando lembra', essa não é a opção que diz 'sempre'. Seja preciso."],
+          ["◐", "Respostas infladas distorcem o resultado", "Um IMC alto baseado em respostas desonestas não te ajuda — apenas adia o enfrentamento dos seus pontos cegos. O diagnóstico é para você."],
+        ].map(([icon, title, desc]) => (
+          <div key={title} style={{ background:C.g900, padding:"20px 24px", display:"flex", gap:16, alignItems:"flex-start" }}>
+            <span style={{ color:C.orange, fontSize:16, flexShrink:0, marginTop:2 }}>{icon}</span>
+            <div>
+              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:700, fontSize:16, textTransform:"uppercase", color:C.white, marginBottom:4 }}>{title}</div>
+              <div style={{ fontSize:13, color:C.g400, lineHeight:1.65 }}>{desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Final note */}
+      <div style={{ background:C.g950, border:`1px solid ${C.g800}`, padding:"20px 24px", marginBottom:36, textAlign:"center" }}>
+        <p style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:C.g400, lineHeight:1.7 }}>
+          Quanto mais honesto você for, mais preciso será o plano de evolução que o diagnóstico vai te entregar.
+        </p>
+      </div>
+
+      <div style={{ display:"flex", gap:10 }}>
+        <button style={s.btnPrimary} onClick={() => setStep("quiz")}>
+          Estou pronto — iniciar →
+        </button>
+        <button style={s.btnSecondary} onClick={() => setStep("intro")}>
+          Voltar
+        </button>
+      </div>
     </div>
   );
 
