@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 
 const C = {
-  black: "#080808", g950: "#0E0E0E", g900: "#141414", g800: "#1C1C1C",
-  g700: "#282828", g600: "#3A3A3A", g500: "#555555", g400: "#7A7A7A",
-  g300: "#A0A0A0", g100: "#E2E2DC", white: "#F2F2ED",
+  black: "var(--c-black)", g950: "var(--c-g950)", g900: "var(--c-g900)", g800: "var(--c-g800)",
+  g700: "var(--c-g700)", g600: "var(--c-g600)", g500: "var(--c-g500)", g400: "var(--c-g400)",
+  g300: "var(--c-g300)", g100: "var(--c-g100)", white: "var(--c-white)",
   orange: "#E8560A", orange2: "#C44808", amber: "#F59E0B", green: "#22C55E",
 };
 
@@ -104,24 +104,39 @@ function getStage(imc) {
 
 const globalStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap');
+  :root {
+    --c-black:#080808; --c-g950:#0E0E0E; --c-g900:#141414; --c-g800:#1C1C1C;
+    --c-g700:#282828; --c-g600:#3A3A3A; --c-g500:#555555; --c-g400:#7A7A7A;
+    --c-g300:#A0A0A0; --c-g100:#E2E2DC; --c-white:#F2F2ED;
+    --c-nav-bg:rgba(8,8,8,0.95);
+  }
+  [data-theme="light"] {
+    --c-black:#F8F7F4; --c-g950:#F1F0EC; --c-g900:#E8E7E2; --c-g800:#DDDBD5;
+    --c-g700:#CCCAC4; --c-g600:#AEACAA; --c-g500:#8A8885; --c-g400:#5E5C5A;
+    --c-g300:#3A3836; --c-g100:#1C1A18; --c-white:#111010;
+    --c-nav-bg:rgba(248,247,244,0.97);
+  }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:#080808; color:#F2F2ED; font-family:'Barlow',sans-serif; }
+  body { background:var(--c-black); color:var(--c-white); font-family:'Barlow',sans-serif; }
   ::-webkit-scrollbar { width:4px; }
-  ::-webkit-scrollbar-track { background:#0E0E0E; }
-  ::-webkit-scrollbar-thumb { background:#3A3A3A; border-radius:2px; }
+  ::-webkit-scrollbar-track { background:var(--c-g950); }
+  ::-webkit-scrollbar-thumb { background:var(--c-g600); border-radius:2px; }
   input, textarea { font-family:'Barlow',sans-serif; }
+  [data-theme="light"] input, [data-theme="light"] textarea {
+    color-scheme: light;
+  }
 `;
 
 const s = {
   app: { minHeight:"100vh", background:C.black, color:C.white, fontFamily:"'Barlow',sans-serif", position:"relative", overflow:"hidden" },
   noise: { position:"fixed", inset:0, backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`, opacity:.022, pointerEvents:"none", zIndex:9999 },
-  nav: { position:"fixed", top:0, left:0, right:0, zIndex:100, borderBottom:`1px solid ${C.g800}`, background:"rgba(8,8,8,0.95)", backdropFilter:"blur(12px)", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 40px", height:56 },
+  nav: { position:"fixed", top:0, left:0, right:0, zIndex:100, borderBottom:`1px solid ${C.g800}`, background:"var(--c-nav-bg)", backdropFilter:"blur(12px)", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 40px", height:56 },
   navLogo: { fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:20, letterSpacing:"-.01em", textTransform:"uppercase", color:C.white, display:"flex", alignItems:"center", gap:10 },
   navLogoAccent: { color:C.orange },
   navOrangeDot: { width:6, height:6, borderRadius:"50%", background:C.orange },
   navLinks: { display:"flex", gap:4 },
   navLink: (active) => ({ fontFamily:"'DM Mono',monospace", fontSize:10, letterSpacing:".18em", textTransform:"uppercase", color: active ? C.white : C.g500, padding:"6px 14px", border: active ? `1px solid ${C.g700}` : "1px solid transparent", background: active ? C.g900 : "transparent", cursor:"pointer", transition:"all .2s" }),
-  navBtn: { fontFamily:"'DM Mono',monospace", fontSize:10, letterSpacing:".15em", textTransform:"uppercase", color:C.black, background:C.orange, border:"none", padding:"8px 20px", cursor:"pointer" },
+  navBtn: { fontFamily:"'DM Mono',monospace", fontSize:10, letterSpacing:".15em", textTransform:"uppercase", color:"#080808", background:C.orange, border:"none", padding:"8px 20px", cursor:"pointer" },
   page: { minHeight:"100vh", paddingTop:56 },
   hero: { minHeight:"calc(100vh - 56px)", display:"flex", flexDirection:"column", justifyContent:"center", padding:"80px 64px", position:"relative", overflow:"hidden" },
   heroGlow: { position:"absolute", top:"-20%", right:"-10%", width:600, height:600, background:"radial-gradient(circle,rgba(232,86,10,.07) 0%,transparent 65%)", pointerEvents:"none" },
@@ -131,7 +146,7 @@ const s = {
   heroTitle: { fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:"clamp(52px,8vw,96px)", lineHeight:.88, letterSpacing:"-.025em", textTransform:"uppercase", marginBottom:28 },
   heroSub: { fontFamily:"'Barlow',sans-serif", fontWeight:300, fontSize:16, color:C.g300, lineHeight:1.7, maxWidth:540, marginBottom:48 },
   heroActions: { display:"flex", gap:12, flexWrap:"wrap" },
-  btnPrimary: { fontFamily:"'Barlow Condensed',sans-serif", fontWeight:700, fontSize:16, textTransform:"uppercase", letterSpacing:".06em", color:C.black, background:C.orange, border:"none", padding:"14px 36px", cursor:"pointer", display:"inline-flex", alignItems:"center", gap:10, transition:"background .2s" },
+  btnPrimary: { fontFamily:"'Barlow Condensed',sans-serif", fontWeight:700, fontSize:16, textTransform:"uppercase", letterSpacing:".06em", color:"#080808", background:C.orange, border:"none", padding:"14px 36px", cursor:"pointer", display:"inline-flex", alignItems:"center", gap:10, transition:"background .2s" },
   btnSecondary: { fontFamily:"'Barlow Condensed',sans-serif", fontWeight:700, fontSize:16, textTransform:"uppercase", letterSpacing:".06em", color:C.white, background:"transparent", border:`1px solid ${C.g600}`, padding:"14px 36px", cursor:"pointer", transition:"all .2s" },
   grid3: { display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:2, margin:"48px 0" },
   card: { background:C.g900, padding:"32px 28px", borderTop:`2px solid ${C.orange}`, position:"relative" },
@@ -175,6 +190,21 @@ const s = {
     cursor:"pointer", whiteSpace:"nowrap",
   }),
 };
+
+const ThemeCtx = createContext({ theme:"dark", toggleTheme:()=>{} });
+
+function ThemeToggle() {
+  const { theme, toggleTheme } = useContext(ThemeCtx);
+  return (
+    <button
+      onClick={toggleTheme}
+      title={theme === "dark" ? "Mudar para tema claro" : "Mudar para tema escuro"}
+      style={{ fontFamily:"'DM Mono',monospace", fontSize:10, letterSpacing:".12em", color:C.g400, background:"transparent", border:`1px solid ${C.g700}`, padding:"5px 12px", cursor:"pointer", whiteSpace:"nowrap" }}
+    >
+      {theme === "dark" ? "◑ Claro" : "◐ Escuro"}
+    </button>
+  );
+}
 
 function RadarChart({ scores, size = 200 }) {
   const cx = size/2, cy = size/2, r = size*0.38;
@@ -1032,7 +1062,8 @@ function Dashboard({ user, onLogout }) {
             <span>{item.label}</span>
           </div>
         ))}
-        <div style={{ position:"absolute", bottom:20, left:0, right:0, padding:"0 24px" }}>
+        <div style={{ position:"absolute", bottom:20, left:0, right:0, padding:"0 24px", display:"flex", flexDirection:"column", gap:8 }}>
+          <ThemeToggle />
           <button style={{ ...s.btnSecondary, width:"100%", fontSize:11, padding:"8px", justifyContent:"center" }} onClick={onLogout}>Sair</button>
         </div>
       </div>
@@ -1153,18 +1184,32 @@ function Landing({ onNavigate }) {
 export default function App() {
   const [page, setPage] = useState("landing");
   const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState("dark");
+
+  function toggleTheme() {
+    setTheme(t => {
+      const next = t === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      return next;
+    });
+  }
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", "dark");
+  }, []);
 
   function handleLogin(u) { setUser(u); setPage("dashboard"); }
   function handleLogout() { setUser(null); setPage("landing"); }
   function handleRegister(u) { if (u) { setUser(u); setPage("dashboard"); } }
 
   return (
+    <ThemeCtx.Provider value={{ theme, toggleTheme }}>
     <div style={s.app}>
       <style>{globalStyles}</style>
       <div style={s.noise}></div>
       {page !== "dashboard" && (
         <nav style={s.nav}>
-          <div style={s.navLogo} onClick={() => setPage("landing")} style={{ ...s.navLogo, cursor:"pointer" }}>
+          <div style={{ ...s.navLogo, cursor:"pointer" }} onClick={() => setPage("landing")}>
             <span>Mentoria</span><span style={s.navLogoAccent}>2C</span>
             <div style={s.navOrangeDot}></div>
           </div>
@@ -1172,7 +1217,10 @@ export default function App() {
             <button style={s.navLink(page==="landing")} onClick={() => setPage("landing")}>Início</button>
             <button style={s.navLink(page==="imc")} onClick={() => setPage("imc")}>IMC</button>
           </div>
-          <button style={s.navBtn} onClick={() => setPage("login")}>Acessar →</button>
+          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+            <ThemeToggle />
+            <button style={s.navBtn} onClick={() => setPage("login")}>Acessar →</button>
+          </div>
         </nav>
       )}
       <div style={page!=="dashboard" ? s.page : {}}>
@@ -1182,5 +1230,6 @@ export default function App() {
         {page==="dashboard" && user && <Dashboard user={user} onLogout={handleLogout} />}
       </div>
     </div>
+    </ThemeCtx.Provider>
   );
 }
